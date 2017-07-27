@@ -9,51 +9,42 @@ A scripting language for rapid UI and interactive application development.
 iio script is a series of statements, which can be composed of one or more expressions.
 
 An expression can be a:
-
-  definition
-  assignment
-  function call
-  core function call
-  conditional
-  loop
+```
+definition
+assignment
+function call
+core function call
+conditional
+loop
+```
 
 Expressions are composed of:
-
-  keywords
-  variables
-  operators
-  values
+```
+keywords
+variables
+operators
+values
+```
 
 Whitespace is used to delineate expressions, statements, keywords, functions, and values.
 
 ### Defnitions
 
-Named variables are created using the 'var' keyword.
-
-Variable definition:
+Named variables are created using the `var` keyword.
 ```
 var i = value
 ```
 
 ### Assignments
 
-Values are assigned using the '=' operator.
-
-Variable assignment:
+Values are assigned using the `=` operator.
 ```
-i = value
-```
-
-Variable definition and assignment:
-```
-var i = value
+i = newValue
 ```
 
 ### Functions
 
-Functions are variables that can be defined with the 'fn' keyword. The 'end' keyword is required at the end of the function body.
-
-Function definition:
+Functions are variables that can be defined with the `fn` keyword. The `end` keyword is required at the end of the function body.
 ```
 var myFunction = fn(params...)
   ...
@@ -61,8 +52,6 @@ end
 ```
 
 Ordered parameters may be defined within trailing parentheses. Whitespace is used to delineate parameters.
-
-Function with parameters definition:
 ```
 var myFunction = fn( arg0 arg1 ... )
   ...
@@ -72,18 +61,16 @@ end
 ### Function Calls
 
 Functions are called by adding a training parentheses to the function name.
-
-Function call:
 ```
 myFunction()
 ```
 
-Function call with parameters:
+Unnamed parameters can be passed:
 ```
-myFunction( arg0 arg1 ... )
+myFunction( a0 a1 ... )
 ```
 
-Function call with named parameters:
+Or named parameters can be passed:
 ```
 myFunction( arg0: a0 arg1: a1)
 ```
@@ -91,8 +78,6 @@ myFunction( arg0: a0 arg1: a1)
 ### Core Function Calls
 
 Core functions are called by adding the function keyword, a set of named parameters, and an 'end' keyword
-
-core function call:
 ```
 set
   property value 
@@ -100,7 +85,7 @@ set
 end
 ```
 
-core functions:
+There are only 3 core functions:
 ```
 new
 add
@@ -123,7 +108,6 @@ end
 ### Loops
 
 Looping blocks are created using the following syntax:
-
 ```
 for var = range [by step]
   ...
@@ -140,16 +124,16 @@ end
 
 ### Ranges
   
-Ranges are defined with two values seperated by a 'to' keyword:
+Ranges are defined with two values seperated by a `to` keyword.
 ```
 0 to 100
 ```
 
-Ranges can be used in loop definitions or random function calls.
+Ranges can be used in loop definitions or `random` function calls.
 
 ### Shapes
 
-shapes are created with the 'new' or 'add' keyword followed by a set of properties and the 'end' keyword
+Shapes are created within the `new` or `add` core function calls. A set of unordered properties can be passed in the function block.
 ```
 var myShape = new 
   type circle
