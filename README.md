@@ -137,11 +137,11 @@ Ranges are defined with two values seperated by a `to` keyword.
 0 to 100
 ```
 
-Ranges can be used in loop definitions or `random` function calls.
+Ranges can be used in loop definitions and `random` function calls.
 
 ### Shapes
 
-Shapes are created within the `new` or `add` core function calls. A set of unordered properties can be passed in the function block.
+Shapes are created within the `new` and `add` core function calls. A set of unordered properties can be passed in the function block.
 ```
 var myShape = new 
   type circle
