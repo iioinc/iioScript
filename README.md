@@ -2,11 +2,17 @@
 
 A scripting language for rapid UI and interactive application development.
 
+Created by @sbiermanlytle and @shzhng
+
+This script could be used on any platform, though it requires an interface to translate the script to a runnable application in the native environment.
+
+A JavaScript interface is provided in this repo using Jison and iioEngine.
+
 ## Specification
 
 ### Syntax
 
-iio script is a series of statements, which can be composed of one or more expressions.
+iioScript is a series of statements, which can be composed of one or more expressions.
 
 An expression can be a:
 ```
@@ -26,13 +32,13 @@ operators
 values
 ```
 
-Whitespace is used to delineate expressions, statements, keywords, functions, and values.
+Whitespace is used to delineate statements, expressions, keywords, functions, and values. New lines are counted as spaces, and are not required for valid syntax.
 
 ### Defnitions
 
 Named variables are created using the `var` keyword.
 ```
-var i = value
+var i
 ```
 
 ### Assignments
