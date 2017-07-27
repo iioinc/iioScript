@@ -93,7 +93,7 @@ set
 end
 ```
 
-There are only 3 core functions:
+There are only a few core functions:
 ```
 new
 add
