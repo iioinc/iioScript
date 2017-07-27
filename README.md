@@ -2,11 +2,13 @@
 
 A scripting language for rapid UI and interactive application development.
 
-Created by @sbiermanlytle and @shzhng
-
 This script could be used on any platform, though it requires an interface to translate the script to a runnable application in the native environment.
 
 A JavaScript interface is provided in this repo using Jison and iioEngine.
+
+### Authors
+
+Created by Sebastian Bierman-Lytle (@sbiermanlytle) and Shuo Zheng (@shzhng)
 
 ## Specification
 
