@@ -1,14 +1,20 @@
 # iioScript
 
-A scripting language for rapid UI and interactive application development.
+A scripting language for rapid animation development.
 
-This script could be used on any platform, though it requires an interface to translate the script to a runnable application in the native environment.
+This language could be used for any platform, though it requires an interface to translate the script to a runnable application in the native environment.
 
-A JavaScript interface is provided in this repo using Jison and iioEngine.
+A JavaScript interface is provided in this repo using Jison and iioEngine: http://iioengine.com
 
 ### Authors
 
 Created by Sebastian Bierman-Lytle (@sbiermanlytle) and Shuo Zheng (@shzhng)
+
+### Source Code
+
+`grammar.jison` defines all iioScript language syntax with hooks into the iioEngine API.
+
+`iioScript.js` is a .iio -> .js transpiler, precompiled with Jison: https://zaa.ch/jison/
 
 ## Specification
 
