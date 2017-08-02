@@ -4,7 +4,7 @@ A scripting language for rapid animation development.
 
 This language could be used for any platform, though it requires an interface to translate the script to a runnable application in the native environment.
 
-A JavaScript interface is provided in this repo using Jison and iioEngine: http://iioengine.com
+A JavaScript interface is provided in this repo using Jison [https://zaa.ch/jison/] and iio Engine [http://iioengine.com], which allows iioScript apps to be run on HTML5 Canvas.
 
 ### Authors
 
@@ -14,7 +14,9 @@ Created by Sebastian Bierman-Lytle (@sbiermanlytle) and Shuo Zheng (@shzhng)
 
 `grammar.jison` defines all iioScript language syntax with hooks into the iioEngine API.
 
-`iioScript.js` is a .iio -> .js transpiler, precompiled with Jison: https://zaa.ch/jison/
+`lib/iioScript.js` is a .iio -> .js transpiler, precompiled from `grammar.jison` with Jison.
+
+`lib/iioEngine.js` is an external library that powers the animation engine.
 
 ## Specification
 
