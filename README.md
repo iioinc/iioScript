@@ -84,7 +84,7 @@ Note that `vel` and `acc` must always be passed as named parameters, otherwise t
 add blue square 20:20 100 vel 1:0 end
 ```
 
-## Specification
+# iioScript Specification
 
 ### Syntax
 
