@@ -4,19 +4,85 @@ A scripting language for rapid animation development.
 
 This language could be used for any platform, though it requires an interface to translate the script to a runnable application in the native environment.
 
-A JavaScript interface is provided in this repo using Jison [https://zaa.ch/jison/] and iio Engine [http://iioengine.com], which allows iioScript apps to be run on HTML5 Canvas.
+A JavaScript interface is provided in this repo using Jison [https://zaa.ch/jison/] and iio Engine [http://iioengine.com], which allows iioScript apps to run on HTML5 Canvas.
 
 ### Authors
 
 Created by Sebastian Bierman-Lytle (@sbiermanlytle) and Shuo Zheng (@shzhng)
 
-### Source Code
+## Source Code
 
 `grammar.jison` defines all iioScript language syntax with hooks into the iioEngine API.
 
 `lib/iioScript.js` is a .iio -> .js transpiler, precompiled from `grammar.jison` with Jison.
 
 `lib/iioEngine.js` is an external library that powers the animation engine.
+
+## How to write iioScript
+
+iioScript is always assumed to be running in an environment with a Graphical User Interface (GUI).
+
+One of the first things to do in a GUI application is set the background color. In iioScript, the GUI is the default context, so just use the `set` command:
+
+```
+set color red end
+```
+
+Note that while the use of the `color` parameter name clarifies the usage of the `red` color keyword, it is not necessary. iioScript allows named and unnamed parameters:
+
+```
+set red end
+```
+
+### Drawing Shapes
+
+The next thing to do in a GUI application is draw shapes on the screen. In iioScript, this is accomplished with the `add` command:
+
+```
+add blue square
+  pos center
+  size 100
+end
+```
+
+This code will add a 100x100px blue square to the center of the screen.
+
+Here is the same code written in a single line without named parameters:
+
+```
+add center blue square 100 end
+```
+
+Note that `center` will be the center vector of the current context. To set a different vector, use the vector syntax `x:y`
+
+```
+add 20:20 blue square 100 end
+```
+
+This code will add the square to the position 20, 20.
+
+Note that you may put spaces in between vector values, ei: `x : y`.
+
+### Animating Shapes
+
+The next thing to do with shapes is to animate them. In iioScript, this is accomplished with a physics engine.
+
+Simply give a shape a velocity and/or acceleration, and the engine will take care of the rest:
+
+```
+add blue square
+  pos center
+  size 100
+  vel 1:0
+  acc .01:0
+end
+```
+
+Note that `vel` and `acc` must always be passed as named parameters, otherwise their vectors assign the shapes position.
+
+```
+add blue square 20:20 100 vel 1:0 end
+```
 
 ## Specification
 
