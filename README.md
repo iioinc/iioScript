@@ -36,7 +36,7 @@ set red end
 
 ### Drawing Shapes
 
-The next thing to do in a GUI application is draw shapes on the screen. In iioScript, this is accomplished with the `add` command:
+The next thing to do in a GUI application is draw shapes on the screen. In iioScript, this is done with the `add` command:
 
 ```
 add blue square
@@ -53,7 +53,7 @@ Here is the same code written in a single line without named parameters:
 add center blue square 100 end
 ```
 
-Note that `center` will be the center vector of the current context. To set a different vector, use the vector syntax `x:y`
+Note that `center` will be the center vector of the current context. To set a different position, use the vector syntax `x:y`
 
 ```
 add 20:20 blue square 100 end
@@ -77,6 +77,8 @@ add blue square
   acc .01:0
 end
 ```
+
+This code will add the blue square to the screen, and slowly move it to the right at 1px per frame, while also decelerating by .01px per frame.
 
 Note that `vel` and `acc` must always be passed as named parameters, otherwise their vectors assign the shapes position.
 
