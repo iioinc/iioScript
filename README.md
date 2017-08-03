@@ -452,9 +452,8 @@ alpha
 shrink
 ```
 
-Some shapes have additional properties:
+The `grid` shape has additional properties:
 
-### grid properties
 ```
 R
 C
