@@ -22,7 +22,7 @@ Created by Sebastian Bierman-Lytle (@sbiermanlytle) and Shuo Zheng (@shzhng)
 
 iioScript is always assumed to be running in an environment with a Graphical User Interface (GUI).
 
-One of the first things to do in a GUI application is set the background color. In iioScript, the GUI is the default context, so just use the `set` command:
+One of the first things to do in a GUI application is set the background color. In iioScript the GUI is the default context, so just use the `set` command:
 
 ```
 set color red end
@@ -36,7 +36,7 @@ set red end
 
 ### Drawing Shapes
 
-The next thing to do in a GUI application is draw shapes on the screen. In iioScript, this is done with the `add` command:
+The next thing to do in a GUI application is draw shapes on the screen. In iioScript this is done with the `add` command:
 
 ```
 add blue square
@@ -53,7 +53,7 @@ Here is the same code written in a single line without named parameters:
 add center blue square 100 end
 ```
 
-Note that `center` will be the center vector of the current context. To set a different position, use the vector syntax `x:y`
+Note that `center` will be the center vector of the current context, which in this case would be the center of the screen. To set a different position, use the vector syntax `x:y`
 
 ```
 add 20:20 blue square 100 end
@@ -61,13 +61,13 @@ add 20:20 blue square 100 end
 
 This code will add the square to the position 20, 20.
 
-Note that you may put spaces in between vector values, ei: `x : y`.
+Note that you can put spaces in between vector values `x : y`.
 
 ### Animating Shapes
 
-The next thing to do with shapes is to animate them. In iioScript, this is accomplished with a physics engine.
+The next thing to do with shapes is to animate them. In iioScript this is accomplished with a physics engine.
 
-Simply give a shape a velocity and/or acceleration, and the engine will take care of the rest:
+Simply give a shape a velocity and/or acceleration, and the engine will take care of the rest, at a default frame rate of 60FPS.
 
 ```
 add blue square
@@ -78,12 +78,158 @@ add blue square
 end
 ```
 
-This code will add the blue square to the screen, and slowly move it to the right at 1px per frame, while also decelerating by .01px per frame.
+This code will add the blue square to the screen, and move it to the right at 1px per frame, while also accelerating the movement by .01px per frame.
 
 Note that `vel` and `acc` must always be passed as named parameters, otherwise their vectors assign the shapes position.
 
+### Updating Shapes
+
+The next important aspect of making a GUI app is updating a shape's animation behavior. In iioScript this is done by assigning a shape to a variable, and then calling the `set` function on that variable.
+
 ```
-add blue square 20:20 100 vel 1:0 end
+var mySquare = add blue square
+  pos center
+  size 100
+  vel 1:0
+end
+
+...
+
+mySquare.set vel -1:0 end
+```
+
+This code creates the variable `mySquare` using the `var` keyword, then assigns to it the same blue square created in the previous example. Later on in the code, the `.` syntax is used to call the `set` function on that variable to reverse its velocity.
+
+Note that `...` is just a indicator for 'later on' and is not valid iioScript syntax.
+
+### Mathematical Operations
+
+As animations become more complex, math can be used to generate property values without having to pre-calculate them.
+
+In iioScript, numbers can be assigned to variables, and arithmetic can be performed. Order of operations is PEMDAS, but can be overridden with `()` characters.
+
+```
+var a = 2
+var b = 3
+var c = a + b
+var d = a - b
+var e = a * b
+var f = a / b
+var g = a ^ b
+var h = a * (a - b)
+```
+
+### Conditional Operations
+
+Sometimes something should only occur if some value is true. In iioScript this is accomplished with `if` statements and boolean evaluations.
+
+```
+var shouldAddShape = true
+
+if shouldAddShape
+  add center blue square 100 end
+end
+```
+
+Note that `true` is not the only "truthy" value. Any value that exists except for `0` is considered to be evaluated to `true`.
+
+`false` can be used in the opposite case, and the `!` operator can be used to negate any boolean value.
+
+### Randomness
+
+Sometimes its more useful to get a random value than it is to specify one. In iioScript this is done with the `random` function.
+
+```
+var a = random 1 to 10
+```
+
+In this code, `a` will be set to a random floating point number in between 1 and 10.
+
+The `random` function can also be used for colors.
+
+```
+var c = random color
+```
+
+### Loops
+
+Many animations need to run a single statement multiple times. In iioScript this is accomplished with the `for` and `while` loops.
+
+```
+for var i = 1 to 10
+  add blue square 100 
+    pos random 0 to width : random 0 to height
+  end
+end
+```
+
+This code will create 10 blue squares in random positions within the bounds of the screen.
+
+### Custom Functions
+
+If a single statement is ever used more than once, it is best to define it once as a function. In iioScript, functions are created with the `fn` keyword.
+
+```
+var addBlueSquare = fn()
+  add blue square 100 
+    pos random 0 to width : random 0 to height
+  end
+end
+
+for var i = 1 to 10
+  addBlueSquare()
+end
+
+addBlueSquare()
+```
+
+This code defines a function called `addBlueSquare`, and then calls it 10 times in a loop, and then once after the loop.
+
+Sometimes the statement defined in a function needs to be altered slightly. In iioScript, unnamed parameters can be used to pass values into functions.
+
+```
+var addBlueSquare = fn( sizeValue )
+  add blue square sizeValue
+    pos random 0 to width : random 0 to height
+  end
+end
+
+addBlueSquare( 50 )
+```
+
+This function will add a blue square to a random spot on the screen, with a given size of 50.
+
+### Detecting Screen Size Changes
+
+Many screens today change sizes - like when a user resizes their window or turns their phone sideways. iioScript handles screen size changes in a generic way with the `onresize` hook.
+
+```
+var repositionShapes = fn()
+  ...
+end
+
+onresize repositionShapes
+```
+
+## Practical Example: Particle Engines
+
+This example is live here: http://iioscript.iioengine.com/demos/squares.html
+
+Many animations include a large group of shapes with similar but slightly different properties. These systems are called Particle Engines.
+
+Creating one with iioScript is very straightforward using the features discussed in the previous section.
+
+```
+set black end
+
+for var i = 0 to 200
+  add white square
+    pos random 0 to width : random 0 to height
+    size random 60 to 140
+    vel random -.5 to .5 : random -.5 to .5
+    alpha random .3 to .6
+  end
+end
 ```
 
 # iioScript Specification
