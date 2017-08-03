@@ -22,13 +22,13 @@ Created by Sebastian Bierman-Lytle (@sbiermanlytle) and Shuo Zheng (@shzhng)
 
 iioScript is always assumed to be running in an environment with a Graphical User Interface (GUI).
 
-One of the first things to do in a GUI application is set the background color. In iioScript the GUI is the default context, so just use the `set` command:
+One of the first things to do in a GUI application is set the background color. In iioScript the GUI is the default context, so just use the `set` command.
 
 ```
 set color red end
 ```
 
-Note that while the use of the `color` parameter name clarifies the usage of the `red` color keyword, it is not necessary. iioScript allows named and unnamed parameters:
+Note that while the use of the `color` parameter name clarifies the usage of the `red` color keyword, it is not necessary. iioScript allows named and unnamed parameters.
 
 ```
 set red end
@@ -36,7 +36,7 @@ set red end
 
 ### Drawing Shapes
 
-The next thing to do in a GUI application is draw shapes on the screen. In iioScript this is done with the `add` command:
+The next thing to do in a GUI application is draw shapes on the screen. In iioScript this is done with the `add` command.
 
 ```
 add blue square
@@ -47,7 +47,7 @@ end
 
 This code will add a 100x100px blue square to the center of the screen.
 
-Here is the same code written in a single line without named parameters:
+Here is the same code written in a single line without named parameters.
 
 ```
 add center blue square 100 end
@@ -84,7 +84,7 @@ Note that `vel` and `acc` must always be passed as named parameters, otherwise t
 
 ### Updating Shapes
 
-The next important aspect of making a GUI app is updating a shape's animation behavior. In iioScript this is done by assigning a shape to a variable, and then calling the `set` function on that variable.
+The next important aspect of making a GUI app is updating a shape's animation behavior. In iioScript this is done by assigning a shape to a variable, and then calling the `set` command on that variable.
 
 ```
 var mySquare = add blue square
@@ -98,7 +98,7 @@ end
 mySquare.set vel -1:0 end
 ```
 
-This code creates the variable `mySquare` using the `var` keyword, then assigns to it the same blue square created in the previous example. Later on in the code, the `.` syntax is used to call the `set` function on that variable to reverse its velocity.
+This code creates the variable `mySquare` using the `var` keyword, then assigns to it the same blue square created in the previous example. Later on in the code, the `.` syntax is used to call the `set` command on that variable to reverse its velocity.
 
 Note that `...` is just a indicator for 'later on' and is not valid iioScript syntax.
 
@@ -121,23 +121,25 @@ var h = a * (a - b)
 
 ### Conditional Operations
 
-Sometimes something should only occur if some value is true. In iioScript this is accomplished with `if` statements and boolean evaluations.
+Sometimes something should only occur if some condition is true. In iioScript this is accomplished with `if` `else` statements and boolean evaluations.
 
 ```
-var shouldAddShape = true
+var shouldAddBlueShape = true
 
-if shouldAddShape
+if shouldAddBlueShape
   add center blue square 100 end
+else
+  add center red square 100 end
 end
 ```
 
-Note that `true` is not the only "truthy" value. Any value that exists except for `0` is considered to be evaluated to `true`.
+Note that `true` is not the only "truthy" value. Any value that exists except for `0` will be evaluated to `true`.
 
 `false` can be used in the opposite case, and the `!` operator can be used to negate any boolean value.
 
 ### Randomness
 
-Sometimes its more useful to get a random value than it is to specify one. In iioScript this is done with the `random` function.
+Sometimes a random value is more useful than a specified one. In iioScript this is done with the `random` command.
 
 ```
 var a = random 1 to 10
@@ -145,7 +147,7 @@ var a = random 1 to 10
 
 In this code, `a` will be set to a random floating point number in between 1 and 10.
 
-The `random` function can also be used for colors.
+The `random` command can also be used for colors.
 
 ```
 var c = random color
@@ -153,7 +155,7 @@ var c = random color
 
 ### Loops
 
-Many animations need to run a single statement multiple times. In iioScript this is accomplished with the `for` and `while` loops.
+Sometimes a single statement needs to run multiple times. In iioScript this is accomplished with `for` and `while` loops.
 
 ```
 for var i = 1 to 10
@@ -165,9 +167,9 @@ end
 
 This code will create 10 blue squares in random positions within the bounds of the screen.
 
-### Custom Functions
+### Functions
 
-If a single statement is ever used more than once, it is best to define it once as a function. In iioScript, functions are created with the `fn` keyword.
+If a single statement is ever used more than once, it is best to define it as a reusable function. In iioScript, functions are created with the `fn` keyword.
 
 ```
 var addBlueSquare = fn()
@@ -183,7 +185,7 @@ end
 addBlueSquare()
 ```
 
-This code defines a function called `addBlueSquare`, and then calls it 10 times in a loop, and then once after the loop.
+This code defines a function called `addBlueSquare`, then calls it 10 times in a loop, and then once after the loop.
 
 Sometimes the statement defined in a function needs to be altered slightly. In iioScript, unnamed parameters can be used to pass values into functions.
 
@@ -201,7 +203,7 @@ This function will add a blue square to a random spot on the screen, with a give
 
 ### Detecting Screen Size Changes
 
-Many screens today change sizes - like when a user resizes their window or turns their phone sideways. iioScript handles screen size changes in a generic way with the `onresize` hook.
+Many screens change sizes - like when a user resizes their window or turns their phone sideways. iioScript handles screen size changes in a generic way with the `onresize` hook.
 
 ```
 var repositionShapes = fn()
@@ -217,13 +219,11 @@ This example is live here: http://iioscript.iioengine.com/demos/squares.html
 
 Many animations include a large group of shapes with similar but slightly different properties. These systems are called Particle Engines.
 
-Creating one with iioScript is very straightforward using the features discussed in the previous section.
+Creating a particle engine with iioScript is very straightforward using the features discussed above.
 
 ```
-set black end
-
 for var i = 0 to 200
-  add white square
+  add red circle
     pos random 0 to width : random 0 to height
     size random 60 to 140
     vel random -.5 to .5 : random -.5 to .5
@@ -242,10 +242,11 @@ An expression can be a:
 ```
 definition
 assignment
-function call
-core function call
 conditional
 loop
+command
+function call
+hook
 ```
 
 Expressions are composed of:
@@ -258,7 +259,7 @@ values
 
 Whitespace is used to delineate statements, expressions, keywords, functions, and values. New lines are counted as spaces, and are not required for valid syntax.
 
-### Defnitions
+### Definitions
 
 Named variables are created using the `var` keyword.
 ```
@@ -272,55 +273,45 @@ Values are assigned using the `=` operator.
 i = newValue
 ```
 
-### Functions
+### Data Types
 
-Functions are variables that can be defined with the `fn` keyword. The `end` keyword is required at the end of the function body.
+iioScript has 4 data types:
 ```
-var myFunction = fn(params...)
-  ...
-end
-```
-
-Ordered parameters may be defined within trailing parentheses. Whitespace is used to delineate parameters.
-```
-var myFunction = fn( arg0 arg1 ... )
-  ...
-end
+Boolean
+Number
+Range
+Color
 ```
 
-### Function Calls
+#### Boolean Data
 
-Functions are called by adding a training parentheses to the function name.
-```
-myFunction()
-```
+`true` or `false`. All non-undefined data types other than `0` will evaluate as `true`
 
-Unnamed parameters can be passed:
-```
-myFunction( a0 a1 ... )
-```
+The `!` symbol is used to negate boolean values
 
-Or named parameters can be passed:
+#### Number Data
+
+All numbers are floating point. There are 2 special number keywords:
+
 ```
-myFunction( arg0: a0 arg1: a1)
+PI
+E
 ```
 
-### Core Function Calls
+The following mathematical operators are available:
 
-Core functions are called by adding the function keyword, a set of named parameters, and an 'end' keyword
+`+ - * / ^ ()`
+
+#### Range Data
+  
+Ranges are defined with two values seperated by a `to` keyword.
 ```
-set
-  property value 
-  ...
-end
+0 to 100
 ```
 
-There are only a few core functions:
-```
-new
-add
-set
-```
+#### Color Data
+
+There are color keywords and `random color` values
 
 ### Conditionals
 
@@ -339,7 +330,7 @@ end
 
 Looping blocks are created using the following syntax:
 ```
-for var = range [by step]
+for var index = start to end [by step]
   ...
 end
 ```
@@ -352,37 +343,104 @@ while boolean_value
 end
 ```
 
-### Ranges
-  
-Ranges are defined with two values seperated by a `to` keyword.
+### Commands
+
+Commands are called by adding the function keyword, a set of named parameters, and an 'end' keyword
 ```
-0 to 100
+set
+  property value 
+  ...
+end
 ```
 
-Ranges can be used in loop definitions and `random` function calls.
+There are only a few commands:
+```
+new
+add
+set
+draw
+clear
+random
+```
+
+### Functions
+
+Functions are variables that can be defined with the `fn` keyword. The `end` keyword is required at the end of the function body.
+```
+var myFunction = fn(params...)
+  ...
+end
+```
+
+Ordered parameters may be defined within trailing parentheses. Whitespace is used to delineate parameters.
+```
+var myFunction = fn( arg0 arg1 ... )
+  ...
+end
+```
+
+The `return` keyword can be used to short circuit the body a function.
+
+### Function Calls
+
+Functions are called by adding a training parentheses to the function name.
+```
+myFunction()
+```
+
+Unnamed parameters can be passed:
+```
+myFunction( a0 a1 ... )
+```
+
+Or named parameters can be passed:
+```
+myFunction( arg0: a0 arg1: a1)
+```
+
+### Hooks
+
+Hooks are special assignments to events that affect the apps environment. Currently there is only a `onresize` hook.
+
+```
+onresize aFunctionToBeCalledOnResize
+```
 
 ### Shapes
 
-Shapes are created within the `new` and `add` core function calls. A set of unordered properties can be passed in the function block.
+Shapes are created within the `new` and `add` commands. A set of unordered properties can be passed in the function block.
 ```
-var myShape = new 
-  type circle
+var myShape = new circle
   size 40
   ...
 end
 ```
 
+The default shape is a `square`.
+
 ```
-add
-  type square
-  size 40
-end
+add size 40 end
 ```
 
-#### shape properties
+#### Shape Types
+
 ```
-type
-vs
+square
+rectangle
+circle
+ellipse
+grid
+x
+```
+
+`o` is an alias for `circle`
+
+```
+add o size 40 end
+```
+
+#### Shape Properties
+```
 pos       x : y : z
 vel       x : y
 acc       x : y
@@ -401,11 +459,4 @@ Some shapes have additional properties:
 R
 C
 res
-```
-
-### text properties
-```
-font
-text
-align
 ```
