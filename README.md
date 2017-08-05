@@ -400,7 +400,7 @@ myFunction( arg0: a0 arg1: a1)
 
 ### Hooks
 
-Hooks are special assignments to events that affect the apps environment. Currently there is only a `onresize` hook.
+Hooks are special assignments to events that affect the apps environment. Currently there is only an `onresize` hook.
 
 ```
 onresize aFunctionToBeCalledOnResize
