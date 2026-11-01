@@ -98,6 +98,7 @@ SOFTWARE.
 "size"                    return 'size_keyword';
 "lineWidth"               return 'lineWidth_keyword';
 "outline"                 return 'outline_keyword';
+"shadow"                  return 'shadow_keyword';
 "alpha"                   return 'alpha_keyword';
 "vel"                     return 'vel_keyword';
 "acc"                     return 'acc_keyword';
@@ -365,6 +366,8 @@ genparam
     {$$ = "type: " + $1 }
   | outline_property
     {$$ = $1 }
+  | shadow_property
+    {$$ = $1 }
   | lineWidth_property
     {$$ = $1 }
   | alpha_property
@@ -447,6 +450,15 @@ outline_property
     {$$ = "lineWidth: "+$2+", outline: "+$3 }
   | outline_keyword color_property expression
     {$$ = "outline: "+$2+", lineWidth: "+$3 }
+  ;
+
+/* A soft shadow behind the shape, its color and blur in either order. iio Engine reads it
+   from one string. */
+shadow_property
+  : shadow_keyword color_property expression
+    {$$ = "shadow: " + $2 + " + ' ' + (" + $3 + ")" }
+  | shadow_keyword expression color_property
+    {$$ = "shadow: " + $3 + " + ' ' + (" + $2 + ")" }
   ;
 
 alpha_property

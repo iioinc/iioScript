@@ -116,10 +116,12 @@ var show = fn()
   end
   for var i = 0 to length of bodyCols
     add across(bodyCols at i) : down(bodyRows at i)
-      size cell color snakeColor outline white 1
+      size cell color snakeColor outline white 1 shadow black 20
     end
   end
-  add across(foodCol) : down(foodRow) size cell color snakeColor outline white 1 end
+  add across(foodCol) : down(foodRow)
+    size cell color snakeColor outline white 1 shadow black 20
+  end
   if playing
     add text "Score: " + score pos width / 2 : 28 size 20 color snakeColor end
   else

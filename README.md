@@ -374,9 +374,10 @@ A complete two-player game, written in iioScript 1.1, is in [`demos/TicTacToe.ii
 - Keys: `onkey` names a function to run with each key pressed.
 - Timers: `every ... seconds` runs a block on an interval it re-reads after each run.
 - Whole numbers: `random whole ... to ...`.
+- Shadows: `shadow black 20` gives a shape a soft shadow of a color and blur.
 - `demos/Snake.iio`, a complete game of Snake.
 
-Breaking change: `every`, `second`, `seconds`, `list`, `append`, `at` and `onkey` can no longer be variable names.
+Breaking change: `every`, `second`, `seconds`, `list`, `append`, `at`, `onkey` and `shadow` can no longer be variable names.
 
 # What's new in 1.1
 
@@ -634,6 +635,7 @@ height
 lineWidth
 color
 alpha
+shadow
 shrink
 ```
 
