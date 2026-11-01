@@ -1,7 +1,7 @@
 /*
   iioScript
   https://github.com/iioinc/iioScript
-  version: 1.1
+  version: 1.2
 ------------------------------------------------------------------------------------------
 iioScript is licensed under the MIT License
 
@@ -56,6 +56,13 @@ SOFTWARE.
 "and"                     return 'and';
 "or"                      return 'or';
 "not"                     return 'not';
+"every"                   return 'every_keyword';
+"seconds"                 return 'seconds_keyword';
+"second"                  return 'seconds_keyword';
+"list"                    return 'list_keyword';
+"append"                  return 'append_keyword';
+"length of"               return 'length_of';
+"at"                      return 'at_keyword';
 
 \-?(?:\d*\.)?\d+          return 'number';
 "."                       return 'dot';
@@ -72,6 +79,7 @@ SOFTWARE.
 
 (red|blue|green|yellow|orange|purple|pink|gray|black|white)\b    return 'color_constant';
 "random color"            return 'color_random';
+"random whole"            return 'random_whole';
 "random"                  return 'random_keyword';
 "color"                   return 'color_keyword';
 
@@ -82,6 +90,7 @@ SOFTWARE.
 "draw"                    return 'draw';
 "clear"                   return 'clear';
 "onresize"                return 'onresize';
+"onkey"                   return 'onkey';
 
 "obj"                     return 'obj_keyword';
 
@@ -126,6 +135,7 @@ SOFTWARE.
 %left '*' '/'
 %left '^'
 %right 'not'
+%left at_keyword
 %nonassoc '('
 
 %start iioscript
@@ -153,6 +163,10 @@ statement
     {$$ = $1;}
   | while_statement
     {$$ = $1;}
+  | every_statement
+    {$$ = $1;}
+  | append_statement
+    {$$ = $1;}
   | if_statement
     {$$ = $1;}
   | expression
@@ -178,6 +192,8 @@ assignment
     {$$ = $1 + ' = ' + $3 + ';' }
   | variable dot variable assign expression
     {$$ = $1 + '.' + $3 + ' = ' + $5 + ';' }
+  | variable at_keyword value assign expression
+    {$$ = $1 + '[' + $3 + '] = ' + $5 + ';' }
   | variable assign color_constant
     {$$ = $1 + " = '" + $3 + "';" }
   | variable assign color_random
@@ -232,6 +248,8 @@ iio_cmd
     {$$ = "app.draw();\n" }
   | onresize expression
     {$$ = "this.resize = " + $2 + ";\n" }
+  | onkey expression
+    {$$ = "this.onKeyDown = function(event, key){ (" + $2 + ")(key); };\n" }
   | obj_keyword dot obj_property expression
     {$$ = 'o.' + $3 + ' = ' + $4 + ';' }
   | obj_keyword dot color_keyword color_property
@@ -280,6 +298,18 @@ for_statement
 while_statement
   : while_keyword expression statements end
     {$$ = '\t\twhile(' + $2 + ') {\n' + $3 + '\t\t}\n'}
+  ;
+
+/* Runs its block every so many seconds, re-reading the interval after each run, so a program
+   can speed up or slow down. */
+every_statement
+  : every_keyword value seconds_keyword statements end
+    {$$ = '\t\tapp.loop(1/(' + $2 + '), function(){\n' + $4 + '\t\treturn 1/(' + $2 + ');\n\t\t});\n'}
+  ;
+
+append_statement
+  : append_keyword expression to_keyword variable
+    {$$ = '\t\t' + $4 + '.push(' + $2 + ');\n'}
   ;
 
 if_statement
@@ -462,6 +492,8 @@ color_property
 random_property
   : random_keyword expression to_keyword expression
     {$$ = "iio.random.num("+$2+","+$4+")" }
+  | random_whole expression to_keyword expression
+    {$$ = "iio.random.integer("+$2+","+$4+")" }
   ;
 
 value
@@ -477,6 +509,12 @@ value
     {$$ = $1}
   | variable dot variable
     {$$ = $1 + '.' + $3}
+  | variable at_keyword value
+    {$$ = $1 + '[' + $3 + ']'}
+  | length_of variable
+    {$$ = $2 + '.length'}
+  | list_keyword
+    {$$ = '[]'}
   | fn_call
     {$$ = $1}
   | '(' value ')'

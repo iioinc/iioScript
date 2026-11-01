@@ -2,7 +2,7 @@
 
 A scripting language for rapid animation development.
 
-Version 1.1. See [What's new in 1.1](#whats-new-in-11). Documentation and live demos: https://script.iioinc.com
+Version 1.2. See [What's new in 1.2](#whats-new-in-12). Documentation and live demos: https://script.iioinc.com
 
 This language could be used for any platform, though it requires an interface to translate the script to a runnable application in the native environment.
 
@@ -294,6 +294,53 @@ while n < 10
 end
 ```
 
+### Lists
+
+`list` makes an empty list, `append` adds to its end, `at` reads or sets the item at a position counting from 0, and `length of` is how many items it holds (1.2).
+
+```
+var xs = list
+append 10 to xs
+append 20 to xs
+xs at 0 = 15
+add xs at 1 : 50 red circle 20 end
+var count = length of xs
+```
+
+### Keys
+
+`onkey` names a function to run each time a key is pressed, with the key's name: `"up arrow"`, `"space"`, `"a"` and so on (1.2).
+
+```
+var steer = fn( key )
+  if key is "left arrow"
+    add center red circle 40 end
+  end
+end
+
+onkey steer
+```
+
+### Timers
+
+`every` runs a block over and over, a number of seconds apart (1.2). The interval is read again after every run, so a program can speed up or slow down by changing it.
+
+```
+var delay = 1
+every delay seconds
+  add random 0 to width : random 0 to height blue circle 20 end
+  delay = delay * .9
+end
+```
+
+### Whole Numbers
+
+`random whole` picks a whole number from the start up to, but not including, the end (1.2), the way a `for` loop counts.
+
+```
+var column = random whole 0 to 10
+```
+
 ## Practical Example: Particle Engines
 
 This example is live here: https://script.iioinc.com/squares
@@ -313,9 +360,23 @@ for var i = 0 to 200
 end
 ```
 
+## Practical Example: Snake
+
+A complete game of Snake, written with lists, keys and a timer, is in [`demos/Snake.iio`](demos/Snake.iio) and live at https://script.iioinc.com/snake
+
 ## Practical Example: Tic-tac-toe
 
 A complete two-player game, written in iioScript 1.1, is in [`demos/TicTacToe.iio`](demos/TicTacToe.iio) and live at https://script.iioinc.com/tic-tac-toe
+
+# What's new in 1.2
+
+- Lists: `list`, `append ... to`, `at` and `length of`.
+- Keys: `onkey` names a function to run with each key pressed.
+- Timers: `every ... seconds` runs a block on an interval it re-reads after each run.
+- Whole numbers: `random whole ... to ...`.
+- `demos/Snake.iio`, a complete game of Snake.
+
+Breaking change: `every`, `second`, `seconds`, `list`, `append`, `at` and `onkey` can no longer be variable names.
 
 # What's new in 1.1
 

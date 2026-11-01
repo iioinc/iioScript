@@ -1,0 +1,144 @@
+// Snake. Steer with the arrow keys or W, A, S and D, eat the food to grow,
+// and don't run into the walls or into yourself. The snake speeds up every
+// time it eats.
+
+set black end
+
+// The board is a grid of columns and rows, as large as fits below the score.
+var columns = 20
+var rows = 14
+var top = 40
+var cell = (height - top) / rows
+var left = (width - columns * cell) / 2
+
+// The snake is two lists, the column and the row of each of its parts, from
+// the tail to the head.
+var bodyCols = list
+var bodyRows = list
+
+// Which way it's going, a column and a row at a time, and which way the
+// last key pressed asks it to go next.
+var dx = 1  var dy = 0
+var nextDx = 1  var nextDy = 0
+
+var foodCol = 0
+var foodRow = 0
+var score = 0
+var best = 0
+var delay = .2
+var playing = false
+
+// The center of a cell, in pixels.
+var across = fn(col)
+  return left + col * cell + cell / 2
+end
+var down = fn(row)
+  return top + row * cell + cell / 2
+end
+
+// True when part of the snake is in the cell.
+var onSnake = fn(col row)
+  for var i = 0 to length of bodyCols
+    if bodyCols at i is col and bodyRows at i is row
+      return true
+    end
+  end
+  return false
+end
+
+// Puts the food in a random cell the snake isn't in.
+var placeFood = fn()
+  foodCol = random whole 0 to columns
+  foodRow = random whole 0 to rows
+  while onSnake(foodCol foodRow)
+    foodCol = random whole 0 to columns
+    foodRow = random whole 0 to rows
+  end
+end
+
+// A snake of four parts, heading right, waiting for a key.
+var newGame = fn()
+  bodyCols = list
+  bodyRows = list
+  for var i = 0 to 4
+    append 6 + i to bodyCols
+    append rows / 2 to bodyRows
+  end
+  dx = 1  dy = 0
+  nextDx = 1  nextDy = 0
+  score = 0
+  delay = .2
+  playing = false
+  placeFood()
+end
+
+// Turns toward the key pressed, but never straight back into the snake.
+// Any key starts a game.
+var steer = fn(key)
+  if (key is "up arrow" or key is "w") and dy is not 1
+    nextDx = 0  nextDy = -1
+  end
+  if (key is "down arrow" or key is "s") and dy is not -1
+    nextDx = 0  nextDy = 1
+  end
+  if (key is "left arrow" or key is "a") and dx is not 1
+    nextDx = -1  nextDy = 0
+  end
+  if (key is "right arrow" or key is "d") and dx is not -1
+    nextDx = 1  nextDy = 0
+  end
+  playing = true
+end
+
+// Draws the board, the snake, the food and the score.
+var show = fn()
+  clear
+  add left + columns * cell / 2 : top + rows * cell / 2
+    size columns * cell : rows * cell
+    outline gray 2
+  end
+  for var i = 0 to length of bodyCols
+    add across(bodyCols at i) : down(bodyRows at i) size cell - 2 green end
+  end
+  add across(foodCol) : down(foodRow) red circle cell - 4 end
+  if playing
+    add text "Score: " + score pos width / 2 : 28 size 20 color white end
+  else
+    add text "Press an arrow key to play. Best: " + best pos width / 2 : 28 size 20 color white end
+  end
+  draw
+end
+
+// One step: move the head a cell, then eat, grow or end the game.
+every delay seconds
+  if playing
+    dx = nextDx  dy = nextDy
+    var headCol = bodyCols at (length of bodyCols - 1) + dx
+    var headRow = bodyRows at (length of bodyRows - 1) + dy
+
+    if headCol < 0 or headCol >= columns or headRow < 0 or headRow >= rows or onSnake(headCol headRow)
+      if score > best best = score end
+      newGame()
+    else if headCol is foodCol and headRow is foodRow
+      append headCol to bodyCols
+      append headRow to bodyRows
+      score = score + 1
+      delay = delay * .9
+      placeFood()
+    else
+      // Every part moves up to the place of the part ahead of it, and the
+      // head moves into the new cell.
+      for var i = 0 to length of bodyCols - 1
+        bodyCols at i = bodyCols at (i + 1)
+        bodyRows at i = bodyRows at (i + 1)
+      end
+      bodyCols at (length of bodyCols - 1) = headCol
+      bodyRows at (length of bodyRows - 1) = headRow
+    end
+  end
+  show()
+end
+
+newGame()
+show()
+onkey steer
