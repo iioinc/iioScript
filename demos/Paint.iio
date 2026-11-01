@@ -1,0 +1,15 @@
+// Click anywhere to drop a circle of a random color and size.
+
+set black end
+
+add center size width : height
+  click(spot)
+    add o
+      pos spot
+      size random 10 to 80
+      random color
+      alpha .7
+    end
+    draw
+  end
+end

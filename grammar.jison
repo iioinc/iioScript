@@ -1,7 +1,7 @@
 /*
   iioScript
   https://github.com/iioinc/iioScript
-  version: 1.0
+  version: 1.1
 ------------------------------------------------------------------------------------------
 iioScript is licensed under the MIT License
 
@@ -30,11 +30,18 @@ SOFTWARE.
 
 %%
 \s+                       /* skip whitespace */
+"//".*                    /* skip comments */
+\"[^"\n]*\"               return 'string';
 "end"                     return 'end';
 ":"                       return 'delimiter_vector';
 ","                       return 'delimiter_list';
+"<="                      return '<=';
+">="                      return '>=';
+"<"                       return '<';
+">"                       return '>';
 "="                       return 'assign';
 "for"                     return 'for_keyword';
+"while"                   return 'while_keyword';
 "to"                      return 'to_keyword';
 "by"                      return 'by_keyword';
 "var"                     return 'var_keyword';
@@ -44,6 +51,11 @@ SOFTWARE.
 "else if"                 return 'elseif_keyword';
 "else"                    return 'else_keyword';
 "then"                    return 'then_keyword';
+"is not"                  return 'isnt';
+"is"                      return 'is';
+"and"                     return 'and';
+"or"                      return 'or';
+"not"                     return 'not';
 
 \-?(?:\d*\.)?\d+          return 'number';
 "."                       return 'dot';
@@ -58,7 +70,7 @@ SOFTWARE.
 "PI"                      return 'PI';
 "E"                       return 'E';
 
-(red|blue|black|white)    return 'color_constant';
+(red|blue|green|yellow|orange|purple|pink|gray|black|white)\b    return 'color_constant';
 "random color"            return 'color_random';
 "random"                  return 'random_keyword';
 "color"                   return 'color_keyword';
@@ -75,13 +87,14 @@ SOFTWARE.
 
 "pos"                     return 'pos_keyword';
 "size"                    return 'size_keyword';
-"color"                   return 'color_keyword';
+"lineWidth"               return 'lineWidth_keyword';
 "outline"                 return 'outline_keyword';
 "alpha"                   return 'alpha_keyword';
 "vel"                     return 'vel_keyword';
 "acc"                     return 'acc_keyword';
 "shrink"                  return 'shrink_keyword';
 "click"                   return 'click_keyword';
+"text"                    return 'text_keyword';
 
 "center"                  return 'center';
 "width"                   return 'width';
@@ -101,12 +114,19 @@ SOFTWARE.
 
 /lex
 
-/* operator associations and precedence */
+/* operator associations and precedence, loosest first. A name followed by "("
+   is a function call (NOCALL is below "("), not a name and then a value in
+   parentheses. */
 
+%nonassoc NOCALL
+%left 'or'
+%left 'and'
+%nonassoc 'is' 'isnt' '<' '>' '<=' '>='
 %left '+' '-'
 %left '*' '/'
 %left '^'
-%left UMINUS
+%right 'not'
+%nonassoc '('
 
 %start iioscript
 
@@ -131,10 +151,12 @@ statement
     {$$ = $1;}
   | for_statement
     {$$ = $1;}
+  | while_statement
+    {$$ = $1;}
   | if_statement
     {$$ = $1;}
   | expression
-    {$$ = $1;}
+    {$$ = $1 + ';\n';}
   | iio_cmd
     {$$ = $1;}
   ;
@@ -154,6 +176,12 @@ declaration
 assignment
   : variable assign expression
     {$$ = $1 + ' = ' + $3 + ';' }
+  | variable dot variable assign expression
+    {$$ = $1 + '.' + $3 + ' = ' + $5 + ';' }
+  | variable assign color_constant
+    {$$ = $1 + " = '" + $3 + "';" }
+  | variable assign color_random
+    {$$ = $1 + ' = iio.random.color();' }
   ;
 
 anon_fn
@@ -165,10 +193,13 @@ anon_fn
 
 fn_call
   : variable '(' expressions ')'
-    {$$ = '\t\t' + $1 + '(' +$3 + ');\n' }
+    {$$ = $1 + '(' + $3 + ')' }
   | variable '(' ')'
-    {$$ = '\t\t' + $1 + '();\n' }
-  | iio_fn
+    {$$ = $1 + '()' }
+  ;
+
+iio_call
+  : iio_fn
     {$$ = 'app.' + $1}
   | variable dot iio_fn
     {$$ = $1 + '.' + $3}
@@ -184,9 +215,7 @@ variables
 expression
   : value
     {$$ = $1}
-  | not value
-    {$$ = '!' + $2;}
-  | fn_call
+  | iio_call
     {$$ = $1}
   | anon_fn
     {$$ = $1}
@@ -200,7 +229,7 @@ iio_cmd
   : clear
     {$$ = "app.objs = [];\n" }
   | draw
-    {$$ = "app.draw();" }
+    {$$ = "app.draw();\n" }
   | onresize expression
     {$$ = "this.resize = " + $2 + ";\n" }
   | obj_keyword dot obj_property expression
@@ -222,7 +251,7 @@ obj_property
 
 return
   : return_keyword value
-    {$$ = "\t\treturn " + $2}
+    {$$ = "return " + $2}
   ;
 
 expressions
@@ -248,20 +277,25 @@ for_statement
     {$$ = '\t\tfor(var ' + $3 + ' = ' + $5 + '; '+$3+'<'+$7+';'+$3+'+=' + $9 + ') {\n' + $10 + '\t\t}\n'}
   ;
 
+while_statement
+  : while_keyword expression statements end
+    {$$ = '\t\twhile(' + $2 + ') {\n' + $3 + '\t\t}\n'}
+  ;
+
 if_statement
   : if_keyword expression statements end
     {$$ = "\t\tif(" + $2 + "){\n" + $3 + "\t\t}\n"}
   | if_keyword expression statements else_keyword statements end
-    {$$ = "\t\tif(" + $2 + "){\n" + $3 + "\t\t} else {\n" + $5 + "\n}" }
+    {$$ = "\t\tif(" + $2 + "){\n" + $3 + "\t\t} else {\n" + $5 + "\n}\n" }
   | if_keyword expression statements elseif_keyword expression statements end
-    {$$ = "\t\tif(" + $2 + "){\n" + $3 + "\t\t} else if( "+ $5 +" ){\n" + $6 + "\n}" }
+    {$$ = "\t\tif(" + $2 + "){\n" + $3 + "\t\t} else if( "+ $5 +" ){\n" + $6 + "\n}\n" }
   | if_keyword expression statements elseif_keyword expression statements else_keyword statements end
-    {$$ = "\t\tif(" + $2 + "){\n" + $3 + "\t\t} else if( "+ $5 +" ){\n" + $6 + "\n} else {\n" + $8 + "\n}" }
+    {$$ = "\t\tif(" + $2 + "){\n" + $3 + "\t\t} else if( "+ $5 +" ){\n" + $6 + "\n} else {\n" + $8 + "\n}\n" }
   ;
 
 alert_fn
   : alert alertparam end
-    {$$ = "alert(" + $2 + " );\n" }
+    {$$ = "alert(" + $2 + " )" }
   ;
 
 alertparam
@@ -273,12 +307,12 @@ alertparam
 
 add_fn
   : add genparams end
-    {$$ = "add({\n\t\t\t" + $2 + "\n\t\t});\n\n" }
+    {$$ = "add({\n\t\t\t" + $2 + "\n\t\t})" }
   ;
 
 set_fn
   : set genparams end
-    {$$ = "set({\n\t\t\t" + $2 + "\n\t\t});\n\n" }
+    {$$ = "set({\n\t\t\t" + $2 + "\n\t\t})" }
   ;
 
 genparams
@@ -301,6 +335,8 @@ genparam
     {$$ = "type: " + $1 }
   | outline_property
     {$$ = $1 }
+  | lineWidth_property
+    {$$ = $1 }
   | alpha_property
     {$$ = "alpha: " + $1 }
   | vel_property
@@ -312,6 +348,8 @@ genparam
   | grid_property
     {$$ = $1 }
   | click_property
+    {$$ = $1 }
+  | text_property
     {$$ = $1 }
   ;
 
@@ -330,14 +368,28 @@ type
     {$$ = "iio.RECT" }
   ;
 
+lineWidth_property
+  : lineWidth_keyword expression
+    {$$ = "lineWidth: " + $2 }
+  ;
+
 grid_property
   : type_grid color_property expression
     {$$ = "type:iio.GRID,\n\t\t\tgridColor:" + $2 + ",\n\t\t\tC: " + $3 + ",\n\t\t\tR: " + $3 }
   ;
 
+/* The names given to click are bound, in order, to where the click landed and,
+   on a grid, the cell clicked and the cell's center. */
 click_property
-  : click_keyword '(' variable ')' statements end
-    {$$ = "click:function(event,ePos," + $3 + "){" + $5 + "}" }
+  : click_keyword '(' variables ')' statements end
+    {$$ = "click:function(event," + $3 + "){" + $5 + "}" }
+  | click_keyword '(' ')' statements end
+    {$$ = "click:function(){" + $4 + "}" }
+  ;
+
+text_property
+  : text_keyword value
+    {$$ = "text: " + $2 }
   ;
 
 shrink_property
@@ -354,7 +406,7 @@ position_property
     {$$ = $1}
   | pos_keyword center
     {$$ = "app.center"}
-  | pos_keyword variable
+  | pos_keyword variable %prec NOCALL
     {$$ = $2;}
   | pos_keyword vector
     {$$ = $2;}
@@ -365,13 +417,6 @@ outline_property
     {$$ = "lineWidth: "+$2+", outline: "+$3 }
   | outline_keyword color_property expression
     {$$ = "outline: "+$2+", lineWidth: "+$3 }
-  ;
-
-outline_params
-  : outline_param
-    {$$ = $1 }
-  | outline_params
-    {$$ = $1 }
   ;
 
 alpha_property
@@ -386,7 +431,7 @@ vel_property
 
 acc_property
   : acc_keyword vector
-    {$$ = $2}
+    {$$ = "acc: " + $2}
   ;
 
 vector
@@ -422,12 +467,20 @@ random_property
 value
   : number
     {$$ = $1}
+  | string
+    {$$ = $1}
   | width
     {$$ = "app.width"}
   | height
     {$$ = "app.height"}
-  | variable
+  | variable %prec NOCALL
     {$$ = $1}
+  | variable dot variable
+    {$$ = $1 + '.' + $3}
+  | fn_call
+    {$$ = $1}
+  | '(' value ')'
+    {$$ = '(' + $2 + ')'}
   | value '+' value
       {$$ = $1 + '+' + $3;}
   | value '-' value
@@ -438,6 +491,24 @@ value
       {$$ = $1 + '/' + $3;}
   | value '^' value
       {$$ = 'Math.pow('+ $1 + ',' + $3 + ')' }
+  | value is value
+      {$$ = $1 + '===' + $3;}
+  | value isnt value
+      {$$ = $1 + '!==' + $3;}
+  | value '<' value
+      {$$ = $1 + '<' + $3;}
+  | value '>' value
+      {$$ = $1 + '>' + $3;}
+  | value '<=' value
+      {$$ = $1 + '<=' + $3;}
+  | value '>=' value
+      {$$ = $1 + '>=' + $3;}
+  | value and value
+      {$$ = $1 + '&&' + $3;}
+  | value or value
+      {$$ = $1 + '||' + $3;}
+  | not value
+      {$$ = '!(' + $2 + ')';}
   | E
       {$$ = 'Math.E' }
   | PI

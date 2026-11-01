@@ -2,6 +2,8 @@
 
 A scripting language for rapid animation development.
 
+Version 1.1. See [What's new in 1.1](#whats-new-in-11). Documentation and live demos: https://script.iioinc.com
+
 This language could be used for any platform, though it requires an interface to translate the script to a runnable application in the native environment.
 
 A JavaScript interface is provided in this repo using Jison [https://zaa.ch/jison/] and iio Engine [http://iioengine.com], which allows iioScript apps to run on HTML5 Canvas.
@@ -135,6 +137,14 @@ end
 
 Note that `true` is not the only "truthy" value. Any value that exists except for `0` will be evaluated to `true`.
 
+Values can be compared with `is`, `is not`, `<`, `>`, `<=` and `>=`, and conditions combined with `and`, `or` and `not` (1.1).
+
+```
+if score >= 10 and not finished
+  add center blue square 100 end
+end
+```
+
 `false` can be used in the opposite case, and the `!` operator can be used to negate any boolean value.
 
 ### Randomness
@@ -213,9 +223,80 @@ end
 onresize repositionShapes
 ```
 
+### Comments
+
+Anything after `//` on a line is a comment (1.1).
+
+```
+// A blue square in the middle of the screen
+add center blue square 100 end
+```
+
+### Text
+
+Strings are written in double quotes, and the `text` property draws one (1.1). For text, `size` is the font size in pixels.
+
+```
+var title = add text "Hello" pos center size 40 color white end
+
+title.set text "Goodbye" end
+```
+
+### Properties
+
+A `.` reads or sets a property of a variable (1.1).
+
+```
+var square = add center blue square 100 end
+
+square.done = true
+if square.done
+  ...
+end
+```
+
+### Clicks
+
+The `click` property runs a block when a shape is clicked (1.1). The names in its parentheses are given, in order, the position of the click and, on a grid, the cell that was clicked and the cell's center. A cell knows its column and row as `.c` and `.r`.
+
+```
+var board = add center grid white 3
+  size 300
+  click(spot cell middle)
+    board.add o pos middle size 40 outline white 4 end
+  end
+end
+```
+
+A shape added with `.add` on another shape is placed relative to that shape's center, so the circle above lands in the middle of the clicked cell.
+
+### Calling Functions in Expressions
+
+Functions can return values with `return`, and be called anywhere a value can be used (1.1).
+
+```
+var double = fn( n )
+  return n * 2
+end
+
+add center blue square double( 50 ) end
+```
+
+### While Loops
+
+A `while` loop runs its block for as long as its condition is true (1.1).
+
+```
+var n = 0
+while n < 10
+  add random 0 to width : random 0 to height red circle 20 end
+  n = n + 1
+end
+```
+
 ## Practical Example: Particle Engines
 
-This example is live here: http://iioscript.iioengine.com/demos/squares.html
+This example is live here: https://script.iioinc.com/demos/squares
 
 Many animations include a large group of shapes with similar but slightly different properties. These systems are called Particle Engines.
 
@@ -231,6 +312,33 @@ for var i = 0 to 200
   end
 end
 ```
+
+## Practical Example: Tic-tac-toe
+
+A complete two-player game, written in iioScript 1.1, is in [`demos/TicTacToe.iio`](demos/TicTacToe.iio) and live at https://script.iioinc.com/tic-tac-toe
+
+# What's new in 1.1
+
+- Comparisons: `is`, `is not`, `<`, `>`, `<=` and `>=`.
+- Logic: `and`, `or` and `not` (as well as `!`), and parentheses for grouping, as the 1.0 docs already described.
+- Strings in double quotes, and a `text` property for drawing them.
+- Reading and setting properties with `.`, as in `cell.mark = 1`.
+- Function calls inside expressions, and `return` with a value.
+- `while` loops, which the 1.0 docs described but the parser didn't implement.
+- `click(...)` names the click position and, on a grid, the cell and its center.
+- `//` comments.
+- `lineWidth`, which `lib/iioScript.js` 1.0 had but `grammar.jison` didn't, and more color names: `green`, `yellow`, `orange`, `purple`, `pink` and `gray`.
+- `var c = random color` and `var c = red`.
+
+Breaking changes: the new keywords (`is`, `and`, `or`, `not`, `while`, `text`, `lineWidth` and the new color names) can no longer be variable names, color names must be whole words (`redness` is now a variable, not `red` and `ness`), and a `click` block's first name is now the click position rather than the grid cell.
+
+`lib/iioScript.js` is generated from `grammar.jison` with Jison 0.4.15:
+
+```
+npx jison@0.4.15 grammar.jison -o lib/iioScript.js
+```
+
+and the license header at the top of `grammar.jison` is then copied above the generated code.
 
 # iioScript Specification
 
@@ -275,10 +383,11 @@ i = newValue
 
 ### Data Types
 
-iioScript has 4 data types:
+iioScript has 5 data types:
 ```
 Boolean
 Number
+String
 Range
 Color
 ```
@@ -301,6 +410,10 @@ E
 The following mathematical operators are available:
 
 `+ - * / ^ ()`
+
+#### String Data
+
+Text in double quotes: `"Hello"`. Strings can't contain a double quote or span lines.
 
 #### Range Data
   
@@ -342,6 +455,17 @@ while boolean_value
   ...
 end
 ```
+
+### Comparisons and Logic
+
+```
+a is b      a is not b
+a < b       a > b
+a <= b      a >= b
+a and b     a or b     not a
+```
+
+From loosest to tightest binding: `or`, `and`, the comparisons, `+ -`, `* /`, `^`, `not`.
 
 ### Commands
 

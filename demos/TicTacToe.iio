@@ -1,0 +1,106 @@
+// Tic-tac-toe for two players, X and O, taking turns on one screen.
+// Click a square to play it. Once the game is over, click the board to
+// start a new one.
+
+set black end
+
+// The nine squares, left to right and top to bottom:
+//   a b c
+//   d e f
+//   g h i
+// Each is 0 while empty, 1 once X plays it and 2 once O does.
+var a = 0  var b = 0  var c = 0
+var d = 0  var e = 0  var f = 0
+var g = 0  var h = 0  var i = 0
+
+var turn = 1
+var moves = 0
+var playing = true
+
+var board
+var status
+
+// Records the current player's mark in square n, counting from 0.
+var mark = fn(n)
+  if n is 0 a = turn end
+  if n is 1 b = turn end
+  if n is 2 c = turn end
+  if n is 3 d = turn end
+  if n is 4 e = turn end
+  if n is 5 f = turn end
+  if n is 6 g = turn end
+  if n is 7 h = turn end
+  if n is 8 i = turn end
+end
+
+// True when the current player holds all three squares.
+var line = fn(p q r)
+  return p is turn and q is turn and r is turn
+end
+
+var won = fn()
+  return line(a b c) or line(d e f) or line(g h i)
+    or line(a d g) or line(b e h) or line(c f i)
+    or line(a e i) or line(c e g)
+end
+
+var say = fn(message)
+  status.set text message end
+end
+
+var play = fn(cell spot)
+  if not playing
+    newGame()
+  else if not cell.mark
+    cell.mark = turn
+    mark(cell.c + cell.r * 3)
+    moves = moves + 1
+
+    if turn is 1
+      board.add x pos spot size 50 color white lineWidth 6 end
+    else
+      board.add o pos spot size 50 outline white 6 end
+    end
+
+    if won()
+      playing = false
+      if turn is 1 say("X wins!") else say("O wins!") end
+    else if moves is 9
+      playing = false
+      say("It's a draw.")
+    else
+      turn = 3 - turn
+      if turn is 1 say("X to play") else say("O to play") end
+    end
+  end
+  draw
+end
+
+var newGame = fn()
+  clear
+  a = 0  b = 0  c = 0
+  d = 0  e = 0  f = 0
+  g = 0  h = 0  i = 0
+  turn = 1
+  moves = 0
+  playing = true
+
+  status = add text "X to play"
+    pos width / 2 : 40
+    size 28
+    color white
+  end
+
+  board = add grid white 3
+    pos width / 2 : height / 2 + 30
+    size 270
+    lineWidth 4
+    click(spot cell middle)
+      play(cell middle)
+    end
+  end
+
+  draw
+end
+
+newGame()
