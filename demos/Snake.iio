@@ -1,6 +1,7 @@
 // Snake. Steer with the arrow keys or W, A, S and D, eat the food to grow,
 // and don't run into the walls or into yourself. The snake speeds up every
-// time it eats, and every game has new colors.
+// time it eats, and every game has new colors. Until a key is pressed, the
+// snake plays itself.
 
 // The board is a grid of columns and rows, as large as fits below the score.
 var columns = 20
@@ -61,6 +62,36 @@ var placeFood = fn()
   end
 end
 
+// True when a cell is on the board and the snake isn't in it.
+var free = fn(col row)
+  return col >= 0 and col < columns and row >= 0 and row < rows and not onSnake(col row)
+end
+
+// Before a game starts, the snake plays itself: it turns toward the food,
+// or failing that any safe way, but never straight back.
+var autoCol = 0
+var autoRow = 0
+var chosen = false
+
+var tryWay = fn(wx wy)
+  if not chosen and not (wx is 0 - dx and wy is 0 - dy) and free(autoCol + wx autoRow + wy)
+    nextDx = wx  nextDy = wy
+    chosen = true
+  end
+end
+
+var autoSteer = fn()
+  autoCol = bodyCols at (length of bodyCols - 1)
+  autoRow = bodyRows at (length of bodyRows - 1)
+  chosen = false
+  if foodCol > autoCol tryWay(1 0) end
+  if foodCol < autoCol tryWay(-1 0) end
+  if foodRow > autoRow tryWay(0 1) end
+  if foodRow < autoRow tryWay(0 -1) end
+  tryWay(dx dy)
+  tryWay(0 1)  tryWay(0 -1)  tryWay(1 0)  tryWay(-1 0)
+end
+
 // Picks a random color for the snake and the food, and the opposite color,
 // each channel turned around, for the background.
 var pickColors = fn()
@@ -72,7 +103,8 @@ var pickColors = fn()
   set color background end
 end
 
-// A snake of four parts, heading right, in new colors, waiting for a key.
+// A snake of four parts, heading right, in new colors, playing itself until
+// a key is pressed.
 var newGame = fn()
   bodyCols = list
   bodyRows = list
@@ -89,9 +121,13 @@ var newGame = fn()
   placeFood()
 end
 
-// Turns toward the key pressed, but never straight back into the snake.
-// Any key starts a game.
+// The first key pressed starts a game. Every key then turns the snake
+// toward it, but never straight back into itself.
 var steer = fn(key)
+  if not playing
+    newGame()
+    playing = true
+  end
   if (key is "up arrow" or key is "w") and dy is not 1
     nextDx = 0  nextDy = -1
   end
@@ -130,32 +166,34 @@ var show = fn()
   draw
 end
 
-// One step: move the head a cell, then eat, grow or end the game.
+// One step: steer, if the snake is playing itself, move the head a cell,
+// then eat, grow or end the game.
 every delay seconds
-  if playing
-    dx = nextDx  dy = nextDy
-    var headCol = bodyCols at (length of bodyCols - 1) + dx
-    var headRow = bodyRows at (length of bodyRows - 1) + dy
+  if not playing autoSteer() end
+  dx = nextDx  dy = nextDy
+  var headCol = bodyCols at (length of bodyCols - 1) + dx
+  var headRow = bodyRows at (length of bodyRows - 1) + dy
 
-    if headCol < 0 or headCol >= columns or headRow < 0 or headRow >= rows or onSnake(headCol headRow)
-      if score > best best = score end
-      newGame()
-    else if headCol is foodCol and headRow is foodRow
-      append headCol to bodyCols
-      append headRow to bodyRows
+  if not free(headCol headRow)
+    if playing and score > best best = score end
+    newGame()
+  else if headCol is foodCol and headRow is foodRow
+    append headCol to bodyCols
+    append headRow to bodyRows
+    if playing
       score = score + 1
       delay = delay * .9
-      placeFood()
-    else
-      // Every part moves up to the place of the part ahead of it, and the
-      // head moves into the new cell.
-      for var i = 0 to length of bodyCols - 1
-        bodyCols at i = bodyCols at (i + 1)
-        bodyRows at i = bodyRows at (i + 1)
-      end
-      bodyCols at (length of bodyCols - 1) = headCol
-      bodyRows at (length of bodyRows - 1) = headRow
     end
+    placeFood()
+  else
+    // Every part moves up to the place of the part ahead of it, and the
+    // head moves into the new cell.
+    for var i = 0 to length of bodyCols - 1
+      bodyCols at i = bodyCols at (i + 1)
+      bodyRows at i = bodyRows at (i + 1)
+    end
+    bodyCols at (length of bodyCols - 1) = headCol
+    bodyRows at (length of bodyRows - 1) = headRow
   end
   show()
 end
