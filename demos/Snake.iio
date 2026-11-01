@@ -9,6 +9,9 @@ var columns = 20
 var rows = 14
 var top = 40
 var cell = (height - top) / rows
+if columns * cell > width
+  cell = width / columns
+end
 var left = (width - columns * cell) / 2
 
 // The snake is two lists, the column and the row of each of its parts, from
