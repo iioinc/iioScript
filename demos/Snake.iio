@@ -71,10 +71,14 @@ var free = fn(col row)
 end
 
 // Before a game starts, the snake plays itself: it turns toward the food,
-// or failing that any safe way, but never straight back.
+// or failing that any safe way, but never straight back. After eating
+// 3 to 8 pieces of food it stops steering and runs into a wall, which
+// starts it over.
 var autoCol = 0
 var autoRow = 0
 var chosen = false
+var eaten = 0
+var appetite = 0
 
 var tryWay = fn(wx wy)
   if not chosen and not (wx is 0 - dx and wy is 0 - dy) and free(autoCol + wx autoRow + wy)
@@ -84,15 +88,17 @@ var tryWay = fn(wx wy)
 end
 
 var autoSteer = fn()
-  autoCol = bodyCols at (length of bodyCols - 1)
-  autoRow = bodyRows at (length of bodyRows - 1)
-  chosen = false
-  if foodCol > autoCol tryWay(1 0) end
-  if foodCol < autoCol tryWay(-1 0) end
-  if foodRow > autoRow tryWay(0 1) end
-  if foodRow < autoRow tryWay(0 -1) end
-  tryWay(dx dy)
-  tryWay(0 1)  tryWay(0 -1)  tryWay(1 0)  tryWay(-1 0)
+  if eaten < appetite
+    autoCol = bodyCols at (length of bodyCols - 1)
+    autoRow = bodyRows at (length of bodyRows - 1)
+    chosen = false
+    if foodCol > autoCol tryWay(1 0) end
+    if foodCol < autoCol tryWay(-1 0) end
+    if foodRow > autoRow tryWay(0 1) end
+    if foodRow < autoRow tryWay(0 -1) end
+    tryWay(dx dy)
+    tryWay(0 1)  tryWay(0 -1)  tryWay(1 0)  tryWay(-1 0)
+  end
 end
 
 // Picks a random color for the snake and the food, and the opposite color,
@@ -118,6 +124,8 @@ var newGame = fn()
   dx = 1  dy = 0
   nextDx = 1  nextDy = 0
   delay = .2
+  eaten = 0
+  appetite = random whole 3 to 9
   playing = false
   pickColors()
   placeFood()
@@ -173,6 +181,7 @@ every delay seconds
     append headCol to bodyCols
     append headRow to bodyRows
     if playing delay = delay * .9 end
+    eaten = eaten + 1
     placeFood()
   else
     // Every part moves up to the place of the part ahead of it, and the
