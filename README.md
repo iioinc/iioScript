@@ -2,7 +2,7 @@
 
 A scripting language for rapid animation development.
 
-Version 1.2. See [What's new in 1.2](#whats-new-in-12). Documentation and live demos: https://script.iioinc.com
+Version 1.2. See [What's new in 1.2](#whats-new-in-12). Documentation and live demos: https://script.iioengine.com
 
 This language could be used for any platform, though it requires an interface to translate the script to a runnable application in the native environment.
 
@@ -343,7 +343,7 @@ var column = random whole 0 to 10
 
 ## Practical Example: Particle Engines
 
-This example is live here: https://script.iioinc.com/squares
+This example is live here: https://script.iioengine.com/squares
 
 Many animations include a large group of shapes with similar but slightly different properties. These systems are called Particle Engines.
 
@@ -362,11 +362,11 @@ end
 
 ## Practical Example: Snake
 
-A complete game of Snake, written with lists, keys and a timer, is in [`demos/Snake.iio`](demos/Snake.iio) and live at https://script.iioinc.com/snake
+A complete game of Snake, written with lists, keys and a timer, is in [`demos/Snake.iio`](demos/Snake.iio) and live at https://script.iioengine.com/snake
 
 ## Practical Example: Tic-tac-toe
 
-A complete two-player game, written in iioScript 1.1, is in [`demos/TicTacToe.iio`](demos/TicTacToe.iio) and live at https://script.iioinc.com/tic-tac-toe
+A complete two-player game, written in iioScript 1.1, is in [`demos/TicTacToe.iio`](demos/TicTacToe.iio) and live at https://script.iioengine.com/tic-tac-toe
 
 # What's new in 1.2
 
