@@ -3,15 +3,20 @@
 // time it eats, and every game has new colors. Until a key is pressed, the
 // snake plays itself.
 
-// The board is a grid of columns and rows, as large as fits below the score.
+// The board is the whole screen: 20 columns, and as many rows of about
+// the same height as fit, stretched a little to fill it exactly. There's no
+// rounding, so a loop counts the rows that fit, and the middle row.
 var columns = 20
-var rows = 14
-var top = 40
-var cell = (height - top) / rows
-if columns * cell > width
-  cell = width / columns
+var cellWidth = width / columns
+var rows = 1
+while (rows + 1) * cellWidth <= height
+  rows = rows + 1
 end
-var left = (width - columns * cell) / 2
+var cellHeight = height / rows
+var middle = 0
+while (middle + 1) * 2 <= rows
+  middle = middle + 1
+end
 
 // The snake is two lists, the column and the row of each of its parts, from
 // the tail to the head.
@@ -25,8 +30,6 @@ var nextDx = 1  var nextDy = 0
 
 var foodCol = 0
 var foodRow = 0
-var score = 0
-var best = 0
 var delay = .2
 var playing = false
 
@@ -36,10 +39,10 @@ var background
 
 // The center of a cell, in pixels.
 var across = fn(col)
-  return left + col * cell + cell / 2
+  return col * cellWidth + cellWidth / 2
 end
 var down = fn(row)
-  return top + row * cell + cell / 2
+  return row * cellHeight + cellHeight / 2
 end
 
 // True when part of the snake is in the cell.
@@ -110,11 +113,10 @@ var newGame = fn()
   bodyRows = list
   for var i = 0 to 4
     append 6 + i to bodyCols
-    append rows / 2 to bodyRows
+    append middle to bodyRows
   end
   dx = 1  dy = 0
   nextDx = 1  nextDy = 0
-  score = 0
   delay = .2
   playing = false
   pickColors()
@@ -143,25 +145,16 @@ var steer = fn(key)
   playing = true
 end
 
-// Draws the board, the snake, the food and the score.
+// Draws the snake and the food.
 var show = fn()
   clear
-  add left + columns * cell / 2 : top + rows * cell / 2
-    size columns * cell : rows * cell
-    outline white 1
-  end
   for var i = 0 to length of bodyCols
     add across(bodyCols at i) : down(bodyRows at i)
-      size cell color snakeColor outline white 1 shadow black 20
+      size cellWidth : cellHeight color snakeColor outline white 1 shadow black 20
     end
   end
   add across(foodCol) : down(foodRow)
-    size cell color snakeColor outline white 1 shadow black 20
-  end
-  if playing
-    add text "Score: " + score pos width / 2 : 28 size 20 color snakeColor end
-  else
-    add text "Press an arrow key to play. Best: " + best pos width / 2 : 28 size 20 color snakeColor end
+    size cellWidth : cellHeight color snakeColor outline white 1 shadow black 20
   end
   draw
 end
@@ -175,15 +168,11 @@ every delay seconds
   var headRow = bodyRows at (length of bodyRows - 1) + dy
 
   if not free(headCol headRow)
-    if playing and score > best best = score end
     newGame()
   else if headCol is foodCol and headRow is foodRow
     append headCol to bodyCols
     append headRow to bodyRows
-    if playing
-      score = score + 1
-      delay = delay * .9
-    end
+    if playing delay = delay * .9 end
     placeFood()
   else
     // Every part moves up to the place of the part ahead of it, and the
