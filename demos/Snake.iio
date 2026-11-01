@@ -1,8 +1,6 @@
 // Snake. Steer with the arrow keys or W, A, S and D, eat the food to grow,
 // and don't run into the walls or into yourself. The snake speeds up every
-// time it eats.
-
-set black end
+// time it eats, and every game has new colors.
 
 // The board is a grid of columns and rows, as large as fits below the score.
 var columns = 20
@@ -30,6 +28,10 @@ var score = 0
 var best = 0
 var delay = .2
 var playing = false
+
+// The snake and its food share a color, and the background is its opposite.
+var snakeColor
+var background
 
 // The center of a cell, in pixels.
 var across = fn(col)
@@ -59,7 +61,18 @@ var placeFood = fn()
   end
 end
 
-// A snake of four parts, heading right, waiting for a key.
+// Picks a random color for the snake and the food, and the opposite color,
+// each channel turned around, for the background.
+var pickColors = fn()
+  var r = random whole 0 to 256
+  var g = random whole 0 to 256
+  var b = random whole 0 to 256
+  snakeColor = "rgb(" + r + "," + g + "," + b + ")"
+  background = "rgb(" + (255 - r) + "," + (255 - g) + "," + (255 - b) + ")"
+  set color background end
+end
+
+// A snake of four parts, heading right, in new colors, waiting for a key.
 var newGame = fn()
   bodyCols = list
   bodyRows = list
@@ -72,6 +85,7 @@ var newGame = fn()
   score = 0
   delay = .2
   playing = false
+  pickColors()
   placeFood()
 end
 
@@ -98,16 +112,18 @@ var show = fn()
   clear
   add left + columns * cell / 2 : top + rows * cell / 2
     size columns * cell : rows * cell
-    outline gray 2
+    outline white 1
   end
   for var i = 0 to length of bodyCols
-    add across(bodyCols at i) : down(bodyRows at i) size cell - 2 green end
+    add across(bodyCols at i) : down(bodyRows at i)
+      size cell color snakeColor outline white 1
+    end
   end
-  add across(foodCol) : down(foodRow) red circle cell - 4 end
+  add across(foodCol) : down(foodRow) size cell color snakeColor outline white 1 end
   if playing
-    add text "Score: " + score pos width / 2 : 28 size 20 color white end
+    add text "Score: " + score pos width / 2 : 28 size 20 color snakeColor end
   else
-    add text "Press an arrow key to play. Best: " + best pos width / 2 : 28 size 20 color white end
+    add text "Press an arrow key to play. Best: " + best pos width / 2 : 28 size 20 color snakeColor end
   end
   draw
 end
