@@ -296,7 +296,7 @@ end
 
 ## Practical Example: Particle Engines
 
-This example is live here: https://script.iioinc.com/demos/squares
+This example is live here: https://script.iioinc.com/squares
 
 Many animations include a large group of shapes with similar but slightly different properties. These systems are called Particle Engines.
 
